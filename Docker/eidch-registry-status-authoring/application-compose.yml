@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: 2025 Swiss Confederation
+#
+# SPDX-License-Identifier: MIT
+
+spring:
+  datasource:
+    url: "jdbc:postgresql://status-registry-db:5432/status-registry-db"
+    username: "postgres"
+    password: "secret"
+
+security:
+  oauth2:
+    jwt:
+      issuer-uris:
+        local-issuer: http://localhost:7080/realms/master
+        #dev-issuer: https://swiyu-oauth-mock-server-d.apps.p-szb-ros-shrd-npr-01.cloud.admin.ch
+        #ref-issuer: https://swiyu-oauth-server-r.apps.p-szb-ros-shrd-npr-01.cloud.admin.ch/realms/bj-swiyu-ecosystem-portal-scs
+
+status-registry:
+  dataUrlTemplate: "http://localhost:8290/api/v1/statuslist/{0}.{1}"
+  authoringBaseUrl: "http://localhost:8280/"
