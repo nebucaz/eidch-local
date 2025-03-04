@@ -23,4 +23,5 @@ mvn clean package -Djacoco.skip=true
 
 # build images & start up
 echo -e "\n\ncompiling done, starting up"
-# docker-compose up --build
+docker-compose up --build
+# docker-compose build
