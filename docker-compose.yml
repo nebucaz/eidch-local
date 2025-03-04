@@ -65,8 +65,8 @@ services:
     command: java -jar -Dspring.config.additional-location=application-compose.yml registry-base-authoring-0.0.6-SNAPSHOT.jar --spring.profiles.active=compose
     depends_on:
       - postgres-base
-    environment:
-      SECURITY_OAUTH2_JWT_ISSUERURIS_KLOAK: "http://localhost:7080/realms/master"
+    #environment:
+    #  SECURITY_OAUTH2_JWT_ISSUERURIS_KLOAK: "http://localhost:7080/realms/master"
   postgres-status:
     image: postgres:15.8
     volumes:
@@ -96,12 +96,12 @@ services:
     image: eidch-registry-status-authoring
     hostname: eidch-registry-status-authoring
     ports:
-      - '8180:8180'
+      - '8280:8280'
     command: java -jar -Dspring.config.additional-location=application-compose.yml registry-status-authoring-0.0.6-SNAPSHOT.jar --spring.profiles.active=compose
     depends_on:
       - postgres-status
-    environment:
-      SECURITY_OAUTH2_JWT_ISSUERURIS_KLOAK: "http://localhost:7080/realms/master"
+    #environment:
+      #SECURITY_OAUTH2_JWT_ISSUERURIS_KLOAK: "http://localhost:7080/realms/master"
   postgres-trust:
     image: postgres:15.8
     volumes:
@@ -111,8 +111,32 @@ services:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "secret"
       POSTGRES_DB: "trust-registry-db"
+    #ports:
+    #  - '5290:5432'
+  eidch-registry-trust-data:
+    build:
+      context: .
+      dockerfile: ./Docker/eidch-registry-trust-data/Dockerfile
+    image: eidch-registry-trust-data
+    hostname: eidch-registry-trust-data
     ports:
-      - '5290:5432'
+      - '8390:8390'
+    command: java -jar -Dspring.config.additional-location=application-compose.yml trust-registry-data-service-0.0.6-SNAPSHOT.jar --spring.profiles.active=compose
+    depends_on:
+      - postgres-trust
+  eidch-registry-trust-authoring:
+    build:
+      context: .
+      dockerfile: ./Docker/eidch-registry-trust-authoring/Dockerfile
+    image: eidch-registry-trust-authoring
+    hostname: eidch-registry-trust-authoring
+    ports:
+      - '8380:8380'
+    command: java -jar -Dspring.config.additional-location=application-compose.yml registry-trust-authoring-0.0.6-SNAPSHOT.jar --spring.profiles.active=compose
+    depends_on:
+      - postgres-trust
+    #environment:
+      #SECURITY_OAUTH2_JWT_ISSUERURIS_KLOAK: "http://localhost:7080/realms/master"
 volumes:
   postgres_kloak_data:
     driver: local

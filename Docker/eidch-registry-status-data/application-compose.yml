@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: "jdbc:postgresql://status-registry-db:5432/status-registry-db"
+    username: "postgres"
+    password: "secret"

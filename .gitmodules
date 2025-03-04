@@ -1,0 +1,18 @@
+[submodule "eidch-registry-base-authoring"]
+	path = eidch-registry-base-authoring
+	url = https://github.com/e-id-admin/eidch-registry-base-authoring
+[submodule "eidch-registry-base-data"]
+	path = eidch-registry-base-data
+	url = https://github.com/e-id-admin/eidch-registry-base-data
+[submodule "eidch-registry-status-data"]
+	path = eidch-registry-status-data
+	url = https://github.com/e-id-admin/eidch-registry-status-data
+[submodule "eidch-registry-status-authoring"]
+	path = eidch-registry-status-authoring
+	url = https://github.com/e-id-admin/eidch-registry-status-authoring
+[submodule "eidch-registry-trust-data"]
+	path = eidch-registry-trust-data
+	url = https://github.com/e-id-admin/eidch-registry-trust-data
+[submodule "eidch-registry-trust-authoring"]
+	path = eidch-registry-trust-authoring
+	url = https://github.com/e-id-admin/eidch-registry-trust-authoring
