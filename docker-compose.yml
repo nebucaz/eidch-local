@@ -1,0 +1,124 @@
+services:
+  postgres-cloak:
+    image: postgres:15.8
+    volumes:
+      - postgres_kloak_data:/var/lib/postgresql/data
+    hostname: keykloak_db
+    environment:
+      POSTGRES_USER: "keycloak"
+      POSTGRES_PASSWORD: "secret"
+      POSTGRES_DB: "keycloak_db"
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    depends_on:
+      - postgres-cloak
+    environment:
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 7080
+      KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+      KC_LOG_LEVEL: info
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keykloak_db/keycloak_db
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: secret
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7080/health/ready"]
+      interval: 15s
+      timeout: 2s
+      retries: 15
+    command: ["start-dev", "--http-port", "7080", "--https-port", "7443"]
+    ports:
+      - '7080:7080'
+  postgres-base:
+    image: postgres:15.8
+    volumes:
+      - postgres_base_data:/var/lib/postgresql/data
+    hostname: base-registry-db
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "secret"
+      POSTGRES_DB: "base-registry-db"
+    ports:
+      - '5180:5432'
+  eidch-registry-base-data:
+    build:
+      context: .
+      dockerfile: ./Docker/eidch-registry-base-data/Dockerfile
+    image: eidch-registry-base-data
+    hostname: eidch-registry-base-data
+    ports:
+      - '8190:8190'
+    command: java -jar -Dspring.config.additional-location=application-compose.yml base-registry-data-service-0.0.6-SNAPSHOT.jar --spring.profiles.active=compose
+    depends_on:
+      - postgres-base
+  eidch-registry-base-authoring:
+    build:
+      context: .
+      dockerfile: ./Docker/eidch-registry-base-authoring/Dockerfile
+    image: eidch-registry-base-authoring
+    hostname: eidch-registry-base-authoring
+    ports:
+      - '8180:8180'
+    command: java -jar -Dspring.config.additional-location=application-compose.yml registry-base-authoring-0.0.6-SNAPSHOT.jar --spring.profiles.active=compose
+    depends_on:
+      - postgres-base
+    environment:
+      SECURITY_OAUTH2_JWT_ISSUERURIS_KLOAK: "http://localhost:7080/realms/master"
+  postgres-status:
+    image: postgres:15.8
+    volumes:
+      - postgres_status_data:/var/lib/postgresql/data
+    hostname: status-registry-db
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "secret"
+      POSTGRES_DB: "status-registry-db"
+    ports:
+      - '5290:5432'
+  eidch-registry-status-data:
+    build:
+      context: .
+      dockerfile: ./Docker/eidch-registry-status-data/Dockerfile
+    image: eidch-registry-status-data
+    hostname: eidch-registry-status-data
+    ports:
+      - '8290:8290'
+    command: java -jar -Dspring.config.additional-location=application-compose.yml status-registry-data-service-0.0.6-SNAPSHOT.jar --spring.profiles.active=compose
+    depends_on:
+      - postgres-status
+  eidch-registry-status-authoring:
+    build:
+      context: .
+      dockerfile: ./Docker/eidch-registry-status-authoring/Dockerfile
+    image: eidch-registry-status-authoring
+    hostname: eidch-registry-status-authoring
+    ports:
+      - '8180:8180'
+    command: java -jar -Dspring.config.additional-location=application-compose.yml registry-status-authoring-0.0.6-SNAPSHOT.jar --spring.profiles.active=compose
+    depends_on:
+      - postgres-status
+    environment:
+      SECURITY_OAUTH2_JWT_ISSUERURIS_KLOAK: "http://localhost:7080/realms/master"
+  postgres-trust:
+    image: postgres:15.8
+    volumes:
+      - postgres_trust_data:/var/lib/postgresql/data
+    hostname: trust-registry-db
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "secret"
+      POSTGRES_DB: "trust-registry-db"
+    ports:
+      - '5290:5432'
+volumes:
+  postgres_kloak_data:
+    driver: local
+  postgres_base_data:
+    driver: local
+  postgres_status_data:
+    driver: local
+  postgres_trust_data:
+    driver: local
