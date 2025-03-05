@@ -16,3 +16,9 @@
 [submodule "eidch-registry-trust-authoring"]
 	path = eidch-registry-trust-authoring
 	url = https://github.com/e-id-admin/eidch-registry-trust-authoring
+[submodule "eidch-issuer-agent-management"]
+	path = eidch-issuer-agent-management
+	url = https://github.com/swiyu-admin-ch/eidch-issuer-agent-management
+[submodule "eidch-issuer-agent-oid4vci"]
+	path = eidch-issuer-agent-oid4vci
+	url = https://github.com/swiyu-admin-ch/eidch-issuer-agent-oid4vci

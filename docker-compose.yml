@@ -77,7 +77,7 @@ services:
       POSTGRES_PASSWORD: "secret"
       POSTGRES_DB: "status-registry-db"
     ports:
-      - '5290:5432'
+      - '5181:5432'
   eidch-registry-status-data:
     build:
       context: .
@@ -86,7 +86,7 @@ services:
     hostname: eidch-registry-status-data
     ports:
       - '8290:8290'
-    command: java -jar -Dspring.config.additional-location=application-compose.yml status-registry-data-service-0.0.6-SNAPSHOT.jar --spring.profiles.active=compose
+    command: java -jar -Dspring.config.additional-location=application-compose.yml registry-status-data-0.0.6-SNAPSHOT.jar --spring.profiles.active=compose
     depends_on:
       - postgres-status
   eidch-registry-status-authoring:
@@ -111,8 +111,8 @@ services:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "secret"
       POSTGRES_DB: "trust-registry-db"
-    #ports:
-    #  - '5290:5432'
+    ports:
+      - '5182:5432'
   eidch-registry-trust-data:
     build:
       context: .
@@ -121,7 +121,7 @@ services:
     hostname: eidch-registry-trust-data
     ports:
       - '8390:8390'
-    command: java -jar -Dspring.config.additional-location=application-compose.yml trust-registry-data-service-0.0.6-SNAPSHOT.jar --spring.profiles.active=compose
+    command: java -jar -Dspring.config.additional-location=application-compose.yml registry-trust-data-0.0.6-SNAPSHOT.jar --spring.profiles.active=compose
     depends_on:
       - postgres-trust
   eidch-registry-trust-authoring:
@@ -132,11 +132,41 @@ services:
     hostname: eidch-registry-trust-authoring
     ports:
       - '8380:8380'
-    command: java -jar -Dspring.config.additional-location=application-compose.yml registry-trust-authoring-0.0.6-SNAPSHOT.jar --spring.profiles.active=compose
+    command: java -jar -Dspring.config.additional-location=application-compose.yml registry-trust-authoring-0.1.1-SNAPSHOT.jar --spring.profiles.active=compose
     depends_on:
       - postgres-trust
     #environment:
       #SECURITY_OAUTH2_JWT_ISSUERURIS_KLOAK: "http://localhost:7080/realms/master"
+  postgres-issuer:
+    image: postgres:15.8
+    volumes:
+      - postgres_issuer_data:/var/lib/postgresql/data
+    hostname: issuer-db
+    environment:
+      POSTGRES_USER: "issuer_mgmt_user"
+      POSTGRES_PASSWORD: "secret"
+      POSTGRES_DB: "issuer_db"
+    ports:
+      - '5183:5432'
+  eidch-issuer-agent-management:
+    image: eidch-issuer-agent-management
+    build:
+      context: .
+      dockerfile: ./Docker/eidch-issuer-agent-management/Dockerfile
+    ports:
+      - '8080:8080'
+    depends_on:
+      - postgres-issuer
+  eidch-issuer-agent-oid4vci:
+    image: eidch-issuer-agent-oidc4vci
+    build:
+      context: .
+      dockerfile: ./Docker/eidch-issuer-agent-oid4vci/Dockerfile
+    ports:
+      - '8081:8080'
+    depends_on:
+      - postgres-issuer
+
 volumes:
   postgres_kloak_data:
     driver: local
@@ -145,4 +175,6 @@ volumes:
   postgres_status_data:
     driver: local
   postgres_trust_data:
+    driver: local
+  postgres_issuer_data:
     driver: local
