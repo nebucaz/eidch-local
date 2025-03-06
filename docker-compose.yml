@@ -41,7 +41,6 @@ services:
     environment:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "secret"
-      #POSTGRES_DB: "base-registry-db"
     ports:
       - '5180:5432'
 
@@ -218,9 +217,5 @@ volumes:
     driver: local
   postgres_registry_data:
     driver: local
-  #postgres_status_data:
-  #  driver: local
-  #postgres_trust_data:
-  #  driver: local
   postgres_issuer_data:
     driver: local

@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: "jdbc:postgresql://base-registry-db:5432/base-registry-db"
+    url: "jdbc:postgresql://postgres-registry:5432/base-registry-db"
     username: "base_registry"
     password: "secret"
 

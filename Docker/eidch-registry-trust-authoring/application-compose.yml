@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: "jdbc:postgresql://trust-registry-db:5432/trust-registry-db"
+    url: "jdbc:postgresql://postgres-registry:5432/trust-registry-db"
     username: "trust_registry"
     password: "secret"
 

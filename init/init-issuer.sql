@@ -12,10 +12,10 @@ CREATE ROLE issuer_db_writers NOLOGIN;
 GRANT issuer_db_writers TO issuer_mgmt_user;
 GRANT issuer_db_writers TO issuer_oid4vci_user;
 
--- Allow the role to connect to database b
+-- Allow the role to connect to database issuer_db
 GRANT CONNECT ON DATABASE issuer_db TO issuer_db_writers;
 
--- Switch to database `b`
+-- Switch to database `issuer_db`
 \c issuer_db;
 
 -- Ensure schema `public` is accessible before granting privileges

@@ -35,7 +35,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO db_writers;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO db_writers;
 
 -- Allow the role to connect to database base_registry_db
-GRANT CONNECT ON DATABASE "base-registry-db" TO db_writers;
+GRANT CONNECT ON DATABASE "status-registry-db" TO db_writers;
 
 -- Switch to database `status_registry_db`
 \c "status-registry-db";
@@ -52,10 +52,13 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO db_writers;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO db_writers;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO db_writers;
 
--- Allow the role to connect to database status_registry_db
-GRANT CONNECT ON DATABASE "status-registry-db" TO db_writers;
+GRANT CREATE ON DATABASE "status-registry-db" TO status_registry;
 
--- Switch to database `trust_registry_db`
+
+-- Allow the role to connect to database status_registry_db
+GRANT CONNECT ON DATABASE "trust-registry-db" TO db_writers;
+
+-- Switch to database `trust-registry-db`
 \c "trust-registry-db";
 
 -- Ensure schema `public` is accessible before granting privileges
@@ -69,6 +72,3 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO db_writers;
 -- Ensure future tables and sequences are also accessible
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO db_writers;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO db_writers;
-
--- Allow the role to connect to database trust_registry_db
-GRANT CONNECT ON DATABASE "trust-registry-db" TO db_writers;
