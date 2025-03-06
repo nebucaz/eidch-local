@@ -1,13 +1,31 @@
-
-CREATE USER issuer_mgmt_user WITH PASSWORD 'secret';
-CREATE USER oid4vci_user WITH PASSWORD 'secret';
+-- Create the database
 CREATE DATABASE issuer_db;
-GRANT ALL PRIVILEGES ON DATABASE issuer_db TO issuer_mgmt_user;
-GRANT USAGE, CREATE ON SCHEMA public TO issuer_mgmt_user;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO issuer_mgmt_user;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO issuer_mgmt_user;
 
-GRANT ALL PRIVILEGES ON DATABASE issuer_db TO oid4vci_user;
-GRANT USAGE, CREATE ON SCHEMA public TO oid4vci_user;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO oid4vci_user;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO oid4vci_user;
+-- Create users (renamed `b` to `c` to avoid conflicts)
+CREATE USER issuer_mgmt_user WITH PASSWORD 'secret';
+CREATE USER issuer_oid4vci_user WITH PASSWORD 'secret';
+
+-- Create role group with NOLOGIN (explicit)
+CREATE ROLE issuer_db_writers NOLOGIN;
+
+-- Grant users access to the role
+GRANT issuer_db_writers TO issuer_mgmt_user;
+GRANT issuer_db_writers TO issuer_oid4vci_user;
+
+-- Allow the role to connect to database b
+GRANT CONNECT ON DATABASE issuer_db TO issuer_db_writers;
+
+-- Switch to database `b`
+\c issuer_db;
+
+-- Ensure schema `public` is accessible before granting privileges
+GRANT USAGE ON SCHEMA public TO issuer_db_writers;
+GRANT CREATE ON SCHEMA public TO issuer_db_writers;
+
+-- Grant permissions for existing tables and sequences
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO issuer_db_writers;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO issuer_db_writers;
+
+-- Ensure future tables and sequences are also accessible
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO issuer_db_writers;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO issuer_db_writers;
