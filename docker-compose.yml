@@ -35,7 +35,8 @@ services:
   postgres-registry:
     image: postgres:15.8
     volumes:
-      - postgres_base_data:/var/lib/postgresql/data
+      - postgres_registry_data:/var/lib/postgresql/data
+      - ./init/init-registry.sql:/docker-entrypoint-initdb.d/init.sql
     hostname: base-registry-db
     environment:
       POSTGRES_USER: "postgres"
@@ -43,6 +44,8 @@ services:
       #POSTGRES_DB: "base-registry-db"
     ports:
       - '5180:5432'
+
+
   eidch-registry-base-data:
     build:
       context: .
@@ -141,15 +144,11 @@ services:
     image: postgres:15.8
     volumes:
       - postgres_issuer_data:/var/lib/postgresql/data
-      #- ./scripts/init-issuer-db.sh:/docker-entrypoint-initdb.d/init-database.sh
       - ./init/init-issuer.sql:/docker-entrypoint-initdb.d/init.sql
     hostname: issuer-db
     environment:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "secret"
-      #POSTGRES_USER: "issuer_mgmt_user"
-      #POSTGRES_PASSWORD: "secret"
-      #POSTGRES_DB: "issuer_db"
     ports:
       - '5183:5432'
   eidch-issuer-agent-management:
@@ -162,15 +161,32 @@ services:
     depends_on:
       - postgres-issuer
     environment:
+      EXTERNAL_URL: "https:<url of your own issuer-agent-oid4vci service>"
+      SPRING_APPLICATION_NAME: "<custom name of the application>"
+      ISSUER_ID: "<Your ISSUER_ID>" #e.g did:tdw:QmejrSkusQgeM6FfA23L6NPoLy3N8aaiV6X5Ysvb47WSj8:identifier-reg-r.trust-infra.swiyu.admin.ch:api:v1:did:ff8eb859-6996-4e51-a976-be1ca584c124
+      DID_STATUS_LIST_VERIFICATION_METHOD: "<Your ISSUER_DID>#assert-key-01"
+      STATUS_LIST_KEY: |
+        -----BEGIN EC PRIVATE KEY-----
+        <private key of the file "assert-key-01">
+        -----END EC PRIVATE KEY-----
+      SWIYU_PARTNER_ID: "<Your SWIYU_PARTNER_ID>"
+      SWIYU_STATUS_REGISTRY_CUSTOMER_KEY: "<Your SWIYU_STATUS_REGISTRY_CUSTOMER_KEY>"
+      SWIYU_STATUS_REGISTRY_CUSTOMER_SECRET: "<Your SWIYU_STATUS_REGISTRY_CUSTOMER_SECRET>"
+      SWIYU_STATUS_REGISTRY_BOOTSTRAP_REFRESH_TOKEN: "<Your SWIYU_STATUS_REGISTRY_BOOTSTRAP_REFRESH_TOKEN>"
+
+      # Environment specific values. Please consult the main manual
+      SWIYU_STATUS_REGISTRY_TOKEN_URL: "https://<KEY_MANAGER for the env>/keycloak/realms/APIGW/protocol/openid-connect/token" #e.g. https://keymanager-npr-intra.api.admin.ch
+      SWIYU_STATUS_REGISTRY_API_URL: "<SWIYU_STATUS_REGISTRY_API_URL>" #e.g. https://status-reg-api-r.trust-infra.swiyu.admin.ch
+
+      # Default settings for the application. Only change these if you know what you are doing
+      LOGGING_LEVEL_CH_ADMIN_BIT_EID: DEBUG
+      SWIYU_STATUS_REGISTRY_AUTH_ENABLE_REFRESH_TOKEN_FLOW: true
+
       POSTGRES_JDBC: "jdbc:postgresql://issuer-db:5432/issuer_db"
       POSTGRES_USER: "issuer_mgmt_user"
       POSTGRES_PASSWORD: "secret"
-      ISSUER_ID: ""
-      EXTERNAL_URL: ""
-      OPENID_CONFIG_FILE: ""
-      METADATA_CONFIG_FILE: ""
-      JWKS_ALLOWLIST: ""
-      SIGNING_KEY_MANAGEMENT_METHOD: ""
+      POSTGRES_DB: issuer_db
+
   eidch-issuer-agent-oid4vci:
     image: eidch-issuer-agent-oidc4vci
     build:
@@ -184,21 +200,27 @@ services:
       POSTGRES_JDBC: "jdbc:postgresql://issuer-db:5432/issuer_db"
       POSTGRES_USER: "oid4vci_user"
       POSTGRES_PASSWORD: "secret"
-      ISSUER_ID: ""
-      EXTERNAL_URL: ""
-      OPENID_CONFIG_FILE: ""
-      METADATA_CONFIG_FILE: ""
-      JWKS_ALLOWLIST: ""
-      SIGNING_KEY_MANAGEMENT_METHOD: ""
+      POSTGRES_DB: issuer_db
+      EXTERNAL_URL: "https://<external url of this service>"
+      ISSUER_ID: "<Your ISSUER_ID>" #e.g did:tdw:QmejrSkusQgeM6FfA23L6NPoLy3N8aaiV6X5Ysvb47WSj8:identifier-reg-r.trust-infra.swiyu.admin.ch:api:v1:did:ff8eb859-6996-4e51-a976-be1ca584c124
+      DID_SDJWT_VERIFICATION_METHOD: "<Your ISSUER_ID>#assert-key-01"
+      SDJWT_KEY: |
+        -----BEGIN EC PRIVATE KEY-----
+        <private key of the file "assert-key-01">
+        -----END EC PRIVATE KEY-----
+      # Default settings for the application. Only change these if you know what you are doing
+      OPENID_CONFIG_FILE: "classpath:openid.json"
+      METADATA_CONFIG_FILE: "file:/cfg-files/issuer_metadata.json"
+      TOKEN_TTL: 600
 
 volumes:
   postgres_kloak_data:
     driver: local
-  postgres_base_data:
+  postgres_registry_data:
     driver: local
-  postgres_status_data:
-    driver: local
-  postgres_trust_data:
-    driver: local
+  #postgres_status_data:
+  #  driver: local
+  #postgres_trust_data:
+  #  driver: local
   postgres_issuer_data:
     driver: local

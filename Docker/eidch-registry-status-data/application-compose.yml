@@ -1,5 +1,5 @@
 spring:
   datasource:
     url: "jdbc:postgresql://status-registry-db:5432/status-registry-db"
-    username: "status-registry"
+    username: "status_registry"
     password: "secret"
