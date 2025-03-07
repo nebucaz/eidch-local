@@ -1,1 +1,1 @@
-docker-compose up postgres-cloak keycloak postgres-registry eidch-registry-base-data eidch-registry-base-authoring
+docker-compose up postgres-cloak keycloak postgres-registry eidch-registry-base-data eidch-registry-base-authoring eidch-registry-status-data eidch-registry-status-authoring

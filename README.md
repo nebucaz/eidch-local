@@ -29,6 +29,7 @@ API Response 201
 **Make the local call**
 http://localhost:8180/swagger-ui/index.html
 
+
 ```shell
 curl -H "Authorization: Bearer $YOUR_AUTH_TOKEN" -X POST "http://localhost:8180/api/v1/entry"
 ```
@@ -51,4 +52,16 @@ The answer is different from the example in the cookbook:
 }
 ```
 
-There is no identifier-
+There is no identifier-url. Let's construct it from the API-description:
+```
+DID_SPACE=$(curl -s -H "Authorization: Bearer $YOUR_AUTH_TOKEN" -X POST "http://localhost:8180/api/v1/entry/")
+ID=$(echo "$DID_SPACE" | jq -r '.id')
+IDENTIFIER_REGISTRY_URL="http://localhost:8190/api/v1/did/${ID}/did.jsonl"
+```
+### Create DID using didtoolkit
+
+```shell
+java -jar didtoolbox.jar create --identifier-registry-url "$IDENTIFIER_REGISTRY_URL")
+```
+
+### Upload the did-log to the base registry
