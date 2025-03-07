@@ -8,6 +8,7 @@ security:
   oauth2:
     jwt:
       issuer-uris:
+        docker-issuer: http://keycloak:7080/realms/master
         local-issuer: http://localhost:7080/realms/master
         #dev-issuer: https://swiyu-oauth-mock-server-d.apps.p-szb-ros-shrd-npr-01.cloud.admin.ch
         #ref-issuer: https://swiyu-oauth-server-r.apps.p-szb-ros-shrd-npr-01.cloud.admin.ch/realms/bj-swiyu-ecosystem-portal-scs

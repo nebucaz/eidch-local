@@ -10,11 +10,15 @@ services:
       POSTGRES_DB: "keycloak_db"
   keycloak:
     image: quay.io/keycloak/keycloak:24.0
+    hostname: keycloak
     depends_on:
       - postgres-cloak
     environment:
-      KC_HOSTNAME: localhost
+      KC_HOSTNAME: keycloak
       KC_HOSTNAME_PORT: 7080
+      KC_HOSTNAME_STRICT: false  # Allows requests from different hostnames
+      KC_HTTP_ENABLED: true
+      KC_PROXY: none  # Use "edge" if behind a reverse proxy
       KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
