@@ -1,8 +1,10 @@
 
+#!/bin/bash
+
+# according to https://swiyu-admin-ch.github.io/cookbooks/onboarding-base-and-trust-registry/
+
 # get access token
 YOUR_AUTH_TOKEN=$(curl -s -d "client_id=eidch" -d "client_secret=iUsyfcM0MXH8oHLsAMOV1HgVeCHuPjJP" -d "grant_type=client_credentials"  "http://localhost:7080/realms/master/protocol/openid-connect/token" | jq -r '.access_token')
-#export YOUR_AUTH_TOKEN
-#echo $YOUR_AUTH_TOKEN
 
 # register did space
 DID_SPACE=$(curl -s -H "Authorization: Bearer $YOUR_AUTH_TOKEN" -X POST "http://localhost:8180/api/v1/entry/")

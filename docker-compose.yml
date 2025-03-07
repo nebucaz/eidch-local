@@ -97,17 +97,6 @@ services:
       - postgres-registry
     #environment:
       #SECURITY_OAUTH2_JWT_ISSUERURIS_KLOAK: "http://localhost:7080/realms/master"
-  # postgres-trust:
-  #   image: postgres:15.8
-  #   volumes:
-  #     - postgres_trust_data:/var/lib/postgresql/data
-  #   hostname: trust-registry-db
-  #   environment:
-  #     POSTGRES_USER: "postgres"
-  #     POSTGRES_PASSWORD: "secret"
-  #     POSTGRES_DB: "trust-registry-db"
-  #   ports:
-  #     - '5182:5432'
   eidch-registry-trust-data:
     build:
       context: .
