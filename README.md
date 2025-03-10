@@ -315,6 +315,12 @@ configs:
       }
 ```
 
+## Become a trusted participantPermalink
+
+To be acclaimed as a trusted issuer or verifier you need to additionally contact us by using the form found on the swiyu Trust Infrastructure service
+
+
+
 ## Initialize the status
 
 Once the issuer-agent-management, issuer-agent-oid4vci and postgres instance are up and running you need to initialize the status list of your issuer so that you can issue credentials.

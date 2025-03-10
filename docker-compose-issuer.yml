@@ -1,0 +1,85 @@
+services:
+  postgres-issuer:
+    image: postgres:15.8
+    volumes:
+      - postgres_issuer_data:/var/lib/postgresql/data
+      - ./init/init-issuer.sql:/docker-entrypoint-initdb.d/init.sql
+    hostname: issuer-db
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "secret"
+    ports:
+      - '5183:5432'
+  eidch-issuer-agent-management:
+    image: eidch-issuer-agent-management
+    build:
+      context: .
+      dockerfile: ./Docker/eidch-issuer-agent-management/Dockerfile
+    #ports:
+    #  - '8080:8080'
+    depends_on:
+      - postgres-issuer
+    environment:
+      EXTERNAL_URL: "http://issuer-oid4vci.home.rwpz.net:8088"
+      SPRING_APPLICATION_NAME: "issuer-mgmt"
+      ISSUER_ID: "${ISSUER_DID}" #e.g did:tdw:QmejrSkusQgeM6FfA23L6NPoLy3N8aaiV6X5Ysvb47WSj8:identifier-reg-r.trust-infra.swiyu.admin.ch:api:v1:did:ff8eb859-6996-4e51-a976-be1ca584c124
+      DID_STATUS_LIST_VERIFICATION_METHOD: "${ISSUER_DID}#assert-key-01"
+      STATUS_LIST_KEY: ${ASSERT_KEY}
+      SWIYU_PARTNER_ID: "<Your SWIYU_PARTNER_ID>"
+      SWIYU_STATUS_REGISTRY_CUSTOMER_KEY: "<Your SWIYU_STATUS_REGISTRY_CUSTOMER_KEY>"
+      SWIYU_STATUS_REGISTRY_CUSTOMER_SECRET: "<Your SWIYU_STATUS_REGISTRY_CUSTOMER_SECRET>"
+      SWIYU_STATUS_REGISTRY_BOOTSTRAP_REFRESH_TOKEN: "<Your SWIYU_STATUS_REGISTRY_BOOTSTRAP_REFRESH_TOKEN>"
+
+      # Environment specific values. Please consult the main manual
+      SWIYU_STATUS_REGISTRY_TOKEN_URL: "https://<KEY_MANAGER for the env>/keycloak/realms/APIGW/protocol/openid-connect/token" #e.g. https://keymanager-npr-intra.api.admin.ch
+      SWIYU_STATUS_REGISTRY_API_URL: "http://status-registry.home.rwpz.net" #e.g. https://status-reg-api-r.trust-infra.swiyu.admin.ch
+
+      # Default settings for the application. Only change these if you know what you are doing
+      LOGGING_LEVEL_CH_ADMIN_BIT_EID: DEBUG
+      SWIYU_STATUS_REGISTRY_AUTH_ENABLE_REFRESH_TOKEN_FLOW: true
+
+      POSTGRES_JDBC: "jdbc:postgresql://issuer-db:5432/issuer_db"
+      POSTGRES_USER: "issuer_mgmt_user"
+      POSTGRES_PASSWORD: "secret"
+      POSTGRES_DB: issuer_db
+
+  eidch-issuer-agent-oid4vci:
+    image: eidch-issuer-agent-oidc4vci
+    build:
+      context: .
+      dockerfile: ./Docker/eidch-issuer-agent-oid4vci/Dockerfile
+    ports:
+      - '8081:8080'
+    depends_on:
+      - postgres-issuer
+    environment:
+      POSTGRES_JDBC: "jdbc:postgresql://issuer-db:5432/issuer_db"
+      POSTGRES_USER: "oid4vci_user"
+      POSTGRES_PASSWORD: "secret"
+      POSTGRES_DB: issuer_db
+      EXTERNAL_URL: "http://issuer-oid4vci.home.rwpz.net:8088"
+      ISSUER_ID: "${ISSUER_DID}" #e.g did:tdw:QmejrSkusQgeM6FfA23L6NPoLy3N8aaiV6X5Ysvb47WSj8:identifier-reg-r.trust-infra.swiyu.admin.ch:api:v1:did:ff8eb859-6996-4e51-a976-be1ca584c124
+      DID_SDJWT_VERIFICATION_METHOD: "${ISSUER_DID}#assert-key-01"
+      SDJWT_KEY: |
+        ----BEGIN EC PRIVATE KEY-----
+        MHcCAQEEIM6BNM6gjsL3FfTYvy8hDnKhULxYDSZyXxOSXgw8MJXnoAoGCCqGSM49\nAwEHoUQDQgAE7eRP6BR7hYNvuHBiRTVLmA2ZxhJL8ftB32B7MZ56HPurpdBrLFoL\n+rl0uvMX7j21G3Y287zW8T0XzqJcLsAYgA==
+        -----END EC PRIVATE KEY-----
+      # Default settings for the application. Only change these if you know what you are doing
+      OPENID_CONFIG_FILE: "classpath:openid.json"
+      METADATA_CONFIG_FILE: "file:/cfg-files/issuer_metadata.json"
+      TOKEN_TTL: 600
+
+  # reverse proxy
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8088:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - eidch-issuer-agent-management
+      - eidch-issuer-agent-oid4vci
+
+volumes:
+  postgres_issuer_data:
+    driver: local

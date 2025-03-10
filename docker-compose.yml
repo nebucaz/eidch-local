@@ -142,8 +142,8 @@ services:
     depends_on:
       - postgres-issuer
     environment:
-      EXTERNAL_URL: "https:<url of your own issuer-agent-oid4vci service>"
-      SPRING_APPLICATION_NAME: "<custom name of the application>"
+      EXTERNAL_URL: "http://issuer-oid4vci.home.rwpz.net" # <url of your own issuer-agent-oid4vci service>"
+      SPRING_APPLICATION_NAME: home-issuer # "<custom name of the application>"
       ISSUER_ID: "<Your ISSUER_ID>" #e.g did:tdw:QmejrSkusQgeM6FfA23L6NPoLy3N8aaiV6X5Ysvb47WSj8:identifier-reg-r.trust-infra.swiyu.admin.ch:api:v1:did:ff8eb859-6996-4e51-a976-be1ca584c124
       DID_STATUS_LIST_VERIFICATION_METHOD: "<Your ISSUER_DID>#assert-key-01"
       STATUS_LIST_KEY: |
@@ -157,7 +157,7 @@ services:
 
       # Environment specific values. Please consult the main manual
       SWIYU_STATUS_REGISTRY_TOKEN_URL: "https://<KEY_MANAGER for the env>/keycloak/realms/APIGW/protocol/openid-connect/token" #e.g. https://keymanager-npr-intra.api.admin.ch
-      SWIYU_STATUS_REGISTRY_API_URL: "<SWIYU_STATUS_REGISTRY_API_URL>" #e.g. https://status-reg-api-r.trust-infra.swiyu.admin.ch
+      SWIYU_STATUS_REGISTRY_API_URL:  # "<SWIYU_STATUS_REGISTRY_API_URL>" #e.g. https://status-reg-api-r.trust-infra.swiyu.admin.ch
 
       # Default settings for the application. Only change these if you know what you are doing
       LOGGING_LEVEL_CH_ADMIN_BIT_EID: DEBUG
@@ -169,7 +169,7 @@ services:
       POSTGRES_DB: issuer_db
 
   eidch-issuer-agent-oid4vci:
-    image: eidch-issuer-agent-oidc4vci
+    image: eidch-issuer-agent-oid4vci
     build:
       context: .
       dockerfile: ./Docker/eidch-issuer-agent-oid4vci/Dockerfile
@@ -182,17 +182,32 @@ services:
       POSTGRES_USER: "oid4vci_user"
       POSTGRES_PASSWORD: "secret"
       POSTGRES_DB: issuer_db
-      EXTERNAL_URL: "https://<external url of this service>"
+      EXTERNAL_URL: "http://issuer-oid4vci.home.rwpz.net"
       ISSUER_ID: "<Your ISSUER_ID>" #e.g did:tdw:QmejrSkusQgeM6FfA23L6NPoLy3N8aaiV6X5Ysvb47WSj8:identifier-reg-r.trust-infra.swiyu.admin.ch:api:v1:did:ff8eb859-6996-4e51-a976-be1ca584c124
       DID_SDJWT_VERIFICATION_METHOD: "<Your ISSUER_ID>#assert-key-01"
-      SDJWT_KEY: |
-        -----BEGIN EC PRIVATE KEY-----
-        <private key of the file "assert-key-01">
-        -----END EC PRIVATE KEY-----
+      SDJWT_KEY: ${ASSERT_KEY}
       # Default settings for the application. Only change these if you know what you are doing
       OPENID_CONFIG_FILE: "classpath:openid.json"
       METADATA_CONFIG_FILE: "file:/cfg-files/issuer_metadata.json"
       TOKEN_TTL: 600
+
+  # reverse proxy
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - keycloak
+      - eidch-registry-base-data
+      - eidch-registry-base-authoring
+      - eidch-registry-status-data
+      - eidch-registry-status-authoring
+      - eidch-registry-trust-data
+      - eidch-registry-trust-authoring
+     # - eidch-issuer-agent-management
+     # - eidch-issuer-agent-oid4vci
 
 volumes:
   postgres_kloak_data:
