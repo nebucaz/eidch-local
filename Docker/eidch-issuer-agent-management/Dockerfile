@@ -5,6 +5,8 @@
 # Dockerfile used for github
 FROM eclipse-temurin:21
 
+RUN apt update && apt install -y dnsutils iputils-ping
+
 RUN mkdir -p /app
 WORKDIR /app
 

@@ -178,7 +178,8 @@ curl -X POST "https://${ISSUER_MGMT}/api/v1/status-list" \
 curl -X POST "http://localhost:8080/api/v1/status-list" \
 -H "Content-Type: application/json" \
 -d '{
-    "uri": "${STATUS_JWT_URL}",
+    "id":"9cd6bee9-ef55-46ad-a7dc-4ff154c432d1",
+    "uri": "http://status-registry.home.rwpz.net/api/v1/statuslist/b0c73d29-431a-40ea-adf1-48c8a18d96b8.jwt",
     "type": "TOKEN_STATUS_LIST",
     "maxLength": 800000,
     "config": {
