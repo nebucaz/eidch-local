@@ -78,15 +78,15 @@ services:
 
 
   # reverse proxy
-  # nginx:
-  #   image: nginx:latest
-  #   ports:
-  #     - "8088:80"
-  #   volumes:
-  #     - ./nginx_issuer.conf:/etc/nginx/nginx.conf:ro
-  #   depends_on:
-  #     - eidch-issuer-agent-management
-  #     - eidch-issuer-agent-oid4vci
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080 :80"
+    volumes:
+      - ./nginx_issuer.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - eidch-issuer-agent-management
+      - eidch-issuer-agent-oid4vci
 
 volumes:
   postgres_issuer_data:

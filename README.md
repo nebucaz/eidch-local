@@ -128,7 +128,6 @@ java -jar didtoolbox.jar create --identifier-registry-url "$IDENTIFIER_REGISTRY_
 
 ### Upload the did-log to the base registry
 
-
 ```
 curl -s -X PUT "${IDENTIFIER_PUT_URL}" \
     -H "Authorization: Bearer $YOUR_AUTH_TOKEN" \
@@ -153,6 +152,41 @@ curl -s -X PUT "${IDENTIFIER_PUT_URL}" \
 |SWIYU_STATUS_REGISTRY_BOOTSTRAP_REFRESH_TOKEN|||
 |SWIYU_STATUS_REGISTRY_TOKEN_URL|||
 |SWIYU_STATUS_REGISTRY_API_URL|||
+
+The script `scripts/register-did.sh` takes care of the above steps (create and register did, populate the VARs in `.env`)
+After running the script, the issuer maz be started:
+
+`docker-compose -f docker-compose-issuer.yml -f issuer-override.yml up postgres-issuer eidch-issuer-agent-management`
+
+When the issuer-management is running, initialize the status-list:
+
+```shell
+curl -X POST "https://${ISSUER_MGMT}/api/v1/status-list" \
+-H "Content-Type: application/json" \
+-d '{
+    "uri": "${STATUS_JWT_URL}",
+    "type": "TOKEN_STATUS_LIST",
+    "maxLength": 800000,
+    "config": {
+    "bits": 2
+    }
+  }'
+```
+
+**Example**
+```shell
+curl -X POST "http://localhost:8080/api/v1/status-list" \
+-H "Content-Type: application/json" \
+-d '{
+    "uri": "${STATUS_JWT_URL}",
+    "type": "TOKEN_STATUS_LIST",
+    "maxLength": 800000,
+    "config": {
+    "bits": 2
+    }
+  }'
+```
+
 
 ## Issuer Agent OID4VCI
 |VAR|Description|Example|
