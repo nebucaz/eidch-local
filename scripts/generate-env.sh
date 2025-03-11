@@ -50,17 +50,42 @@ if [ -z "$ISSUER_DID" ]; then
   exit 1
 fi
 
-# Customer secret (could also be passed or read from another secure location)
-# CUSTOMER_SECRET="your_customer_secret_here"
-#ISSUER_ID=$ISSUER_DID
-#ASSERT_KEY=$PRIVATE_KEY
+CLIENT="ISSUER_MGMT"
+SECRET=kW94KAL0D9Bwd3vrqvdHoJwMQRS0twWt
 
+TOKEN=$(curl --url "http://localhost:7080/realms/master/protocol/openid-connect/token" \
+    --header 'Content-Type: application/x-www-form-urlencoded' \
+    -d "client_id=${CLIENT}" \
+    -d "client_secret=${SECRET}" \
+    -d "grant_type=password"  \
+    -d "username=issuer_user" \
+    -d "password=issuer_user" \
+    -d "scope=offline_access")
+
+echo $TOKEN
+ACCESS_TOKEN=$(echo $TOKEN | jq -r '.access_token')
+REFRESH_TOKEN=$(echo $TOKEN | jq -r '.refresh_token')
+
+# Generate SDJWT_KEY and set it as env variable:
+#openssl ecparam -genkey -name prime256v1 -noout -out private.pem
+
+# Generate public key
+#openssl ec -in private.pem -pubout -out ec_public.pem
+# SDJWT_KEY=$(awk '{printf "%s\\n", $0}' "private.pem")
 
 # Generate .env file
 cat > .env <<EOF
+ID=$ISSUER_ID
 ISSUER_DID=$ISSUER_DID
 ASSERT_KEY=$PRIVATE_KEY
+PARTNER_ID="7805a775-bac0-4726-ad2f-c68e8fefa05c"
+STATUS_REGISTRY_CUSTOMER_KEY=$CLIENT
+STATUS_REGISTRY_CUSTOMER_SECRET=$SECRET
+STATUS_REGISTRY_BOOTSTRAP_REFRESH_TOKEN=$REFRESH_TOKEN
+EXTERNAL_URL="http://issuer-oid4vci.home.rwpz.net"
+STATUS_REGISTRY_API_URL="http://status-registry.home.rwpz.net"
+
 EOF
 
-echo ".env file generated successfully for ID=$ISSUER_ID!"
+echo ".env file generated successfully for ID=$ISSUER_ID"
 

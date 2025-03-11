@@ -1,4 +1,4 @@
-
+*.pem
 did/*
 .env
 .didtoolbox/*

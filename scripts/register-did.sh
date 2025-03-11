@@ -5,7 +5,7 @@
 
 BASE_ROOT="http://base-registry.home.rwpz.net"
 BASE_AUTHORING_ROOT="http://authoring-base-registry.home.rwpz.net"
-STATUS_ROOT="http://base-registry.home.rwpz.net"
+STATUS_ROOT="http://status-registry.home.rwpz.net"
 STATUS_AUTHORING_ROOT="http://authoring-status-registry.home.rwpz.net"
 
 # get access token
@@ -53,6 +53,7 @@ STATUS=$(echo "$RESULT" | jq -r '.status')
 if [ "$STATUS" != "ACTIVE" ]; then
     echo "Error: The status is not ACTIVE, it is $STATUS."
     exit 1
+
 fi
 
 echo "did ${ID} successfully registered"
@@ -67,16 +68,93 @@ echo "did ${ID} successfully registered"
 
 STATUS_SPACE=$(curl -s -X POST "${STATUS_AUTHORING_ROOT}/api/v1/entry/" \
     -H 'accept: application/json' \
-    -H "Authorization: Bearer $YOUR_AUTH_TOKEN")
-
-#echo $STATUS_SPACE
+    -H "Authorization: Bearer $YOUR_AUTH_TOKEN" \
+    -d "{}")
 
 STATUS_LIST_ID=$(echo "$STATUS_SPACE" | jq -r '.id')
-echo -e "\nStatus List ID=${STATUS_LIST_ID}"
+echo "Status List ID=${STATUS_LIST_ID}"
+
 STATUS_READ_URL="${STATUS_ROOT}/api/v1/statuslist/${STATUS_LIST_ID}.jwt"
+echo "Status read URL=${STATUS_READ_URL}"
 
-# pdate status list
-# curl -X PUT 'https://status-reg-api.trust-infra.swiyu-int.admin.ch/api/v1/status/business-entities/{businessEntityId}/status-list-entries/{statusRegistryEntryId}' \
-#   -H 'Content-Type: application/statuslist+jwt' \
-#   -d 'Status list content according to https://www.ietf.org/archive/id/draft-ietf-oauth-status-list-02.html#name-status-list-request'
+# STATUS_ENTRY=$(curl -s -X GET "${STATUS_READ_URL}" \
+#     -H 'accept: application/statuslist+jwt' \
+#     -H "Authorization: Bearer $YOUR_AUTH_TOKEN")
 
+# echo $STATUS_ENTRY
+
+ISSUER_ID=$ID
+
+# Path to private key
+KEY_FILE="./did/${ISSUER_ID}/assert-key-01"
+
+# Path to did-log key
+DID_LOG="./did/${ISSUER_ID}/did.jsonl"
+
+# Check if key file exists
+if [ ! -f "$KEY_FILE" ]; then
+  echo "Private key file not found: $KEY_FILE"
+  exit 1
+fi
+
+# Check JSONL file
+if [ ! -f "$DID_LOG" ]; then
+  echo "JSONL file not found: $DID_LOG"
+  exit 1
+fi
+
+# Read and escape private key content
+PRIVATE_KEY=$(awk '{printf "%s\\n", $0}' "$KEY_FILE")
+ISSUER_DID=$(jq -r '.[3].value.id' "$DID_LOG")
+if [ -z "$ISSUER_DID" ]; then
+  echo "Failed to extract ID from $DID_LOG"
+  exit 1
+fi
+
+CLIENT="ISSUER_MGMT"
+SECRET=kW94KAL0D9Bwd3vrqvdHoJwMQRS0twWt
+
+TOKEN=$(curl -s --url "http://localhost:7080/realms/master/protocol/openid-connect/token" \
+    --header 'Content-Type: application/x-www-form-urlencoded' \
+    -d "client_id=${CLIENT}" \
+    -d "client_secret=${SECRET}" \
+    -d "grant_type=password"  \
+    -d "username=issuer_user" \
+    -d "password=issuer_user" \
+    -d "scope=offline_access")
+
+ACCESS_TOKEN=$(echo $TOKEN | jq -r '.access_token')
+REFRESH_TOKEN=$(echo $TOKEN | jq -r '.refresh_token')
+
+# Generate SDJWT_KEY and set it as env variable:
+openssl ecparam -genkey -name prime256v1 -noout -out private.pem
+
+# Generate public key
+openssl ec -in private.pem -pubout -out ec_public.pem
+
+# Generate .env file
+cat > .env <<EOF
+ID=$ISSUER_ID
+ISSUER_DID=$ISSUER_DID
+PARTNER_ID="7805a775-bac0-4726-ad2f-c68e8fefa05c"
+STATUS_REGISTRY_CUSTOMER_KEY=$CLIENT
+STATUS_REGISTRY_CUSTOMER_SECRET=$SECRET
+STATUS_REGISTRY_BOOTSTRAP_REFRESH_TOKEN=$REFRESH_TOKEN
+EXTERNAL_URL="http://issuer-oid4vci.home.rwpz.net"
+STATUS_REGISTRY_API_URL="http://status-registry.home.rwpz.net"
+STATUS_LIST_ID=$STATUS_LIST_ID
+
+EOF
+
+# Create docker-compose.override.yml
+{
+  echo "services:"
+  echo "  eidch-issuer-agent-management:"
+  echo "    environment:"
+  echo "      STATUS_LIST_KEY: |"
+  sed 's/^/        /' "$KEY_FILE"
+  echo "  eidch-issuer-agent-oid4vci:"
+  echo "    environment:"
+  echo "      SDJWT_KEY: |"
+  sed 's/^/        /' "private.pem"
+} > issuer-override.yml
