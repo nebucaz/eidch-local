@@ -23,7 +23,9 @@ DID_SPACE=$(< /tmp/response.txt)
 ID=$(echo "$DID_SPACE" | jq -r '.id')
 echo "ID: ${ID}"
 
-IDENTIFIER_REGISTRY_URL="${BASE_ROOT}/api/v1/did/${ID}/did.jsonl"
+#IDENTIFIER_REGISTRY_URL="${BASE_ROOT}/api/v1/did/${ID}/did.jsonl"
+IDENTIFIER_REGISTRY_URL=$(echo "$DID_SPACE" | jq -r '.files.DID_TDW.readUri')
+
 echo "Registry URL: $IDENTIFIER_REGISTRY_URL"
 
 # create DID
@@ -74,7 +76,9 @@ STATUS_SPACE=$(curl -s -X POST "${STATUS_AUTHORING_ROOT}/api/v1/entry/" \
 STATUS_LIST_ID=$(echo "$STATUS_SPACE" | jq -r '.id')
 echo "Status List ID=${STATUS_LIST_ID}"
 
-STATUS_READ_URL="${STATUS_ROOT}/api/v1/statuslist/${STATUS_LIST_ID}.jwt"
+
+#STATUS_READ_URL="${STATUS_ROOT}/api/v1/statuslist/${STATUS_LIST_ID}.jwt"
+STATUS_READ_URL=$(echo "$STATUS_SPACE" | jq -r '.files.TokenStatusListJWT.readUri')
 echo "Status read URL=${STATUS_READ_URL}"
 
 # STATUS_ENTRY=$(curl -s -X GET "${STATUS_READ_URL}" \

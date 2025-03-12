@@ -11,7 +11,7 @@ TOKEN=$(curl -s --url "http://localhost:7080/realms/master/protocol/openid-conne
 ACCESS_TOKEN=$(echo $TOKEN | jq -r '.access_token')
 REFRESH_TOKEN=$(echo $TOKEN | jq -r '.refresh_token')
 
-echo $ACCESS_TOKEN
+#echo $ACCESS_TOKEN
 echo $REFRESH_TOKEN
 
 #export YOUR_AUTH_TOKEN

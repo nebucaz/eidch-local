@@ -188,6 +188,10 @@ curl -X POST "http://localhost:8080/api/v1/status-list" \
   }'
 ```
 
+### Start the issuer management service
+
+`docker-compose -f docker-compose-issuer.yml -f issuer-override.yml up postgres-issuer eidch-issuer-agent-management`
+
 
 ## Issuer Agent OID4VCI
 |VAR|Description|Example|

@@ -22,10 +22,8 @@ DID_SPACE=$(< /tmp/response.txt)
 ID=$(echo "$DID_SPACE" | jq -r '.id')
 echo "ID: ${ID}"
 
-# test upload did
-
-
-IDENTIFIER_REGISTRY_URL="${BASE_ROOT}/api/v1/did/${ID}/did.jsonl"
+#IDENTIFIER_REGISTRY_URL="${BASE_ROOT}/api/v1/did/${ID}/did.jsonl"
+IDENTIFIER_REGISTRY_URL=$(echo "$DID_SPACE" | jq -r '.files.DID_TDW.readUri')
 echo "Registry URL: $IDENTIFIER_REGISTRY_URL"
 
 # create DID
