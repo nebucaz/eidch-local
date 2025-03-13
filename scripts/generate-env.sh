@@ -75,6 +75,9 @@ REFRESH_TOKEN=$(echo $TOKEN | jq -r '.refresh_token')
 
 # Generate .env file
 cat > .env <<EOF
+POSTGRES_USER="issuer_mgmt_user"
+POSTGRES_PASS="secret"
+POSTGRES_DB="issuer_db"
 ID=$ISSUER_ID
 ISSUER_DID=$ISSUER_DID
 PARTNER_ID="7805a775-bac0-4726-ad2f-c68e8fefa05c"
@@ -83,7 +86,6 @@ STATUS_REGISTRY_CUSTOMER_SECRET=$SECRET
 STATUS_REGISTRY_BOOTSTRAP_REFRESH_TOKEN=$REFRESH_TOKEN
 EXTERNAL_URL="http://issuer-oid4vci.home.rwpz.net"
 STATUS_REGISTRY_API_URL="http://status-registry.home.rwpz.net"
-
 EOF
 
 echo ".env file generated successfully for ID=$ISSUER_ID"

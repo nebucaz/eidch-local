@@ -73,6 +73,7 @@ STATUS_SPACE=$(curl -s -X POST "${STATUS_AUTHORING_ROOT}/api/v1/entry/" \
     -H "Authorization: Bearer $YOUR_AUTH_TOKEN" \
     -d "{}")
 
+
 STATUS_LIST_ID=$(echo "$STATUS_SPACE" | jq -r '.id')
 echo "Status List ID=${STATUS_LIST_ID}"
 
@@ -148,6 +149,7 @@ EXTERNAL_URL="http://issuer-oid4vci.home.rwpz.net"
 STATUS_REGISTRY_API_URL="http://authoring-status-registry.home.rwpz.net"
 STATUS_LIST_ID=$STATUS_LIST_ID
 STATUS_JWT_URL=$STATUS_READ_URL
+TOKEN_URL="http://keycloak:7080/realms/master/protocol/openid-connect/token"
 EOF
 
 # Create docker-compose.override.yml
