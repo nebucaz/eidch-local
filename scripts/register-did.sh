@@ -3,6 +3,7 @@
 
 # according to https://swiyu-admin-ch.github.io/cookbooks/onboarding-base-and-trust-registry/
 
+PARTNER_ID="7805a775-bac0-4726-ad2f-c68e8fefa05c"
 BASE_ROOT="http://base-registry.home.rwpz.net"
 BASE_AUTHORING_ROOT="http://authoring-base-registry.home.rwpz.net"
 STATUS_ROOT="http://status-registry.home.rwpz.net"
@@ -42,7 +43,8 @@ echo "$YOUR_GENERATED_DIDLOG" > $DID_LOG
 # Upload DID log
 #   -X PUT "https://identifier-reg-api.trust-infra.swiyu-int.admin.ch/api/v1/identifier/business-entities/$YOUR_BUSINESS_ENTITY_ID/identifier-entries/$ID_FROM_PREVIOUS_STEP"
 
-IDENTIFIER_PUT_URL="${BASE_AUTHORING_ROOT}/api/v1/did/${ID}/did.jsonl"
+#IDENTIFIER_PUT_URL="${BASE_AUTHORING_ROOT}/api/v1/did/${ID}/did.jsonl"
+IDENTIFIER_PUT_URL="${BASE_AUTHORING_ROOT}/api/v1/identifier/business-entities/swiyu-parner-id/identifier-entries/${ID}"
 
 RESULT=$(curl -s -X PUT "${IDENTIFIER_PUT_URL}" \
     -H "Authorization: Bearer $YOUR_AUTH_TOKEN" \
@@ -67,12 +69,14 @@ echo "did ${ID} successfully registered"
 #   -d ''
 # get status list entry /api/v1/statuslist/{datastoreEntryId}.jwt
 #STATUS_SPACE=$(curl -s -X POST "http://localhost:8280/api/v1/entry/" \
-
-STATUS_SPACE=$(curl -s -X POST "${STATUS_AUTHORING_ROOT}/api/v1/entry/" \
+#STATUS_SPACE=$(curl -s -X POST "${STATUS_AUTHORING_ROOT}/api/v1/entry/" \
+STATUS_SPACE=$(curl -X POST "${STATUS_AUTHORING_ROOT}/api/v1/status/business-entities/swiyu-parner-id/status-list-entries/" \
     -H 'accept: application/json' \
     -H "Authorization: Bearer $YOUR_AUTH_TOKEN" \
     -d "{}")
 
+echo $STATUS_SPACE  #| jq .
+exit 0
 
 STATUS_LIST_ID=$(echo "$STATUS_SPACE" | jq -r '.id')
 echo "Status List ID=${STATUS_LIST_ID}"
@@ -141,7 +145,7 @@ openssl ec -in private.pem -pubout -out ec_public.pem
 cat > .env <<EOF
 ID=$ISSUER_ID
 ISSUER_DID=$ISSUER_DID
-PARTNER_ID="7805a775-bac0-4726-ad2f-c68e8fefa05c"
+PARTNER_ID=$PARTNER_ID
 STATUS_REGISTRY_CUSTOMER_KEY=$CLIENT
 STATUS_REGISTRY_CUSTOMER_SECRET=$SECRET
 STATUS_REGISTRY_BOOTSTRAP_REFRESH_TOKEN=$REFRESH_TOKEN
@@ -164,3 +168,9 @@ EOF
   echo "      SDJWT_KEY: |"
   sed 's/^/        /' "private.pem"
 } > issuer-override.yml
+
+
+curl -X POST "http://authoring-status-registry.home.rwpz.net/api/v1/status/business-entities/swiyu-parner-id/status-list-entries/" \
+    -H 'accept: application/json' \
+    -H "Authorization: Bearer $YOUR_AUTH_TOKEN" \
+    -d "{}"
