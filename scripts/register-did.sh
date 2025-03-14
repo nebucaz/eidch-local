@@ -170,7 +170,7 @@ EOF
 } > issuer-override.yml
 
 
-curl -X POST "http://authoring-status-registry.home.rwpz.net/api/v1/status/business-entities/swiyu-parner-id/status-list-entries/" \
-    -H 'accept: application/json' \
-    -H "Authorization: Bearer $YOUR_AUTH_TOKEN" \
-    -d "{}"
+# curl -X POST "http://authoring-status-registry.home.rwpz.net/api/v1/status/business-entities/swiyu-parner-id/status-list-entries/" \
+#     -H 'accept: application/json' \
+#     -H "Authorization: Bearer $YOUR_AUTH_TOKEN" \
+#     -d "{}"

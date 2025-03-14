@@ -1,5 +1,6 @@
 issuer-override.yml
 *.pem
+credential_offers/*
 did/*
 .env
 .didtoolbox/*
