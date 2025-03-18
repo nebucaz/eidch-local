@@ -70,13 +70,13 @@ echo "did ${ID} successfully registered"
 # get status list entry /api/v1/statuslist/{datastoreEntryId}.jwt
 #STATUS_SPACE=$(curl -s -X POST "http://localhost:8280/api/v1/entry/" \
 #STATUS_SPACE=$(curl -s -X POST "${STATUS_AUTHORING_ROOT}/api/v1/entry/" \
-STATUS_SPACE=$(curl -X POST "${STATUS_AUTHORING_ROOT}/api/v1/status/business-entities/swiyu-parner-id/status-list-entries/" \
+STATUS_SPACE=$(curl -s -X POST "${STATUS_AUTHORING_ROOT}/api/v1/status/business-entities/swiyu-parner-id/status-list-entries/" \
     -H 'accept: application/json' \
     -H "Authorization: Bearer $YOUR_AUTH_TOKEN" \
     -d "{}")
 
 echo $STATUS_SPACE  #| jq .
-exit 0
+
 
 STATUS_LIST_ID=$(echo "$STATUS_SPACE" | jq -r '.id')
 echo "Status List ID=${STATUS_LIST_ID}"
