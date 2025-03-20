@@ -5,6 +5,8 @@ CREATE DATABASE issuer_db;
 CREATE USER issuer_mgmt_user WITH PASSWORD 'secret';
 CREATE USER issuer_oid4vci_user WITH PASSWORD 'secret';
 
+-- ALTER DATABASE issuer_db OWNER TO issuer_mgmt_user;
+
 -- Create role group with NOLOGIN (explicit)
 CREATE ROLE issuer_db_writers NOLOGIN;
 

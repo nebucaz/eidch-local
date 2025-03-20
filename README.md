@@ -1,5 +1,25 @@
 # eidch-local
 
+## Start Issuer Manager
+
+Use `./scripts/register-did.sh` to register DID and create environment (`.env`) with config-values for manager. Don't forget to configure the oid4vci agent, if it is run with IDE (for debugging)
+
+```shell
+docker-compose -f docker-compose-issuer.yml -f issuer-override.yml up postgres-issuer eidch-issuer-agent-management
+```
+
+## Credential offer
+(URL decoded)
+
+```json
+openid-credential-offer://?credential_offer={"grants":{"urn:ietf:params:oauth:grant-type:pre-authorized_code":{"pre-authorized_code":"76b7474c-5d17-4ec4-860d-309c90c51dce"}},"version":"1.0","credential_issuer":"https://issuer-oid4vci.home.rwpz.net","credential_configuration_ids":["university_example_sd_jwt"]}
+````
+
+## Credential metadata
+
+```json
+```
+
 # Keycloak
 ## Client configuration (eidch)
 

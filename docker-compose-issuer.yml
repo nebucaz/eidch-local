@@ -10,6 +10,7 @@ services:
       POSTGRES_PASSWORD: "secret"
     ports:
       - '5183:5432'
+
   eidch-issuer-agent-management:
     image: eidch-issuer-agent-management
     build:
@@ -49,6 +50,7 @@ services:
       POSTGRES_USER: "issuer_mgmt_user"
       POSTGRES_PASSWORD: "secret"
       POSTGRES_DB: issuer_db
+      MY_SPRING_PROFILES: "rwpz"
 
   eidch-issuer-agent-oid4vci:
     image: eidch-issuer-agent-oidc4vci
@@ -77,7 +79,7 @@ services:
       OPENID_CONFIG_FILE: "classpath:openid.json"
       METADATA_CONFIG_FILE: "file:/cfg-files/issuer_metadata.json"
       TOKEN_TTL: 600
-      MY_SPRING_PROFILES_: "local"
+      MY_SPRING_PROFILES  : "rwpz"
 
 
   # reverse proxy
@@ -94,6 +96,7 @@ services:
 volumes:
   postgres_issuer_data:
     driver: local
+
 
 configs:
   issuer_metadata:

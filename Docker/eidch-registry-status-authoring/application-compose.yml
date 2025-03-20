@@ -20,5 +20,5 @@ security:
 status-registry:
   #dataUrlTemplate: "http://localhost:8290/api/v1/statuslist/{0}.{1}"
   #authoringBaseUrl: "http://localhost:8280/"
-  dataUrlTemplate: "http://status-registry.home.rwpz.net/api/v1/statuslist/{0}.{1}"
-  authoringBaseUrl: "http://authoring-status-registry.home.rwpz.net/"
+  dataUrlTemplate: "https://status-registry.home.rwpz.net/api/v1/statuslist/{0}.{1}"
+  authoringBaseUrl: "https://authoring-status-registry.home.rwpz.net/"

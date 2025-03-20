@@ -14,5 +14,5 @@ security:
 did-authoring:
   #didTdwRouteTemplate: "http://localhost:8190/api/v1/did/{0}"
   #didWebTemplate: "did:web:localhost%3A8190:api:v1:did:{0}"
-  didTdwRouteTemplate: "http://base-registry.home.rwpz.net/api/vi/did/{0}"
+  didTdwRouteTemplate: "https://base-registry.home.rwpz.net/api/v1/did/{0}"
   didWebTemplate: "did:web:base-registry.home.rwpz.net:api:v1:did:{0}"
