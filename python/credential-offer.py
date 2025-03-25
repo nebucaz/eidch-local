@@ -94,14 +94,39 @@ def get_credential_offer(status_registry_url):
 #  "credential_metadata": {
 #    "vct#integrity": "sha256-0000000000000000000000000000000000000000000="
 #  },
+            # "degree": {
+            #     "type": "Diploma",
+            #     "name": "Test Diploma"
+            # }
+# "average_grade": 10
+
+    payload1 = {
+        "metadata_credential_supported_id": [
+            "my_credential_sd_jwt"
+        ],
+        "credential_subject_data": {
+            "lastName": "Example",
+            "firstName": "Edward",
+            "address": {
+                "street_address": "12 Queens Boulevard",
+                "locality": "London",
+                "region": "",
+                "country": "United Kingdom"
+            }
+        },
+        "offer_validity_seconds": 86400,
+        "credential_valid_until": CREDENTIAL_VALID_UNTIL,
+        "credential_valid_from":  CREDENTIAL_VALID_FROM,
+        "status_lists": [status_registry_url]
+    }
 
     payload = {
         "metadata_credential_supported_id": [
-            "university_example_sd_jwt"
+            "member_card_sd_jwt"
         ],
         "credential_subject_data": {
-            "degree": "Test",
-            "name": "Test", "average_grade": 10
+            "type": "Gold Member",
+            "since": CREDENTIAL_VALID_FROM,
         },
         "offer_validity_seconds": 86400,
         "credential_valid_until": CREDENTIAL_VALID_UNTIL,

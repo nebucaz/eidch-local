@@ -4,10 +4,10 @@
 # according to https://swiyu-admin-ch.github.io/cookbooks/onboarding-base-and-trust-registry/
 
 PARTNER_ID="7805a775-bac0-4726-ad2f-c68e8fefa05c"
-BASE_ROOT="http://base-registry.home.rwpz.net"
-BASE_AUTHORING_ROOT="http://authoring-base-registry.home.rwpz.net"
-STATUS_ROOT="http://status-registry.home.rwpz.net"
-STATUS_AUTHORING_ROOT="http://authoring-status-registry.home.rwpz.net"
+BASE_ROOT="https://base-registry.home.rwpz.net"
+BASE_AUTHORING_ROOT="https://authoring-base-registry.home.rwpz.net"
+STATUS_ROOT="https://status-registry.home.rwpz.net"
+STATUS_AUTHORING_ROOT="https://authoring-status-registry.home.rwpz.net"
 
 # get access token
 YOUR_AUTH_TOKEN=$(curl -s -d "client_id=eidch" -d "client_secret=iUsyfcM0MXH8oHLsAMOV1HgVeCHuPjJP" -d "grant_type=client_credentials"  "http://localhost:7080/realms/master/protocol/openid-connect/token" | jq -r '.access_token')
